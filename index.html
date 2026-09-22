@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Yacht Dice Scoreboard</title>
+  
+  <!-- 무료 오픈소스 Pretendard 웹폰트 -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+
+  <style>
+    :root {
+      --primary: #2563EB;       /* 선명한 보드게임 로열 블루 */
+      --primary-dark: #1D4ED8;
+      --primary-light: #DBEAFE;
+      --accent-red: #DC2626;     /* 0점/경고 레드 */
+      --accent-yellow: #F59E0B;  /* 승자/골드 옐로 */
+      --accent-green: #059669;   /* 보너스 그린 */
+      --bg: #F1F5F9;
+      --card-bg: #FFFFFF;
+      --border-dark: #1E293B;    /* 캐주얼한 느낌을 주는 또렷한 외곽선 */
+      --border: #CBD5E1;
+      --text-main: #0F172A;
+      --text-muted: #475569;
+    }
+
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      font-family: "Pretendard Variable", Pretendard, -apple-system, sans-serif;
+      touch-action: manipulation;
+    }
+    
+    body { 
+      background-color: var(--bg); 
+      color: var(--text-main); 
+      padding-bottom: 40px; 
+    }
+
+    header {
+      background-color: var(--primary);
+      border-bottom: 3px solid var(--border-dark);
+      padding: 14px 16px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    }
+    
+    .brand-title {
+      display: inline-block;
+      cursor: pointer;
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #FFFFFF;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.1s ease;
+      letter-spacing: -0.5px;
+    }
+    .brand-title:active {
+      transform: scale(0.97);
+    }
+
+    .container { max-width: 600px; margin: 0 auto; padding: 14px 10px; }
+
+    /* Setup Screen */
+    #setup-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      border: 2.5px solid var(--border-dark);
+      padding: 24px 20px;
+      box-shadow: 4px 4px 0px var(--border-dark);
+      text-align: center;
+      margin-top: 16px;
+    }
+    .setup-title { font-size: 1.2rem; font-weight: 800; margin-bottom: 4px; color: var(--text-main); }
+    .setup-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 18px; font-weight: 500; }
+
+    .player-btn-group { display: flex; gap: 10px; justify-content: center; margin-bottom: 24px; }
+    .btn-count {
+      width: 48px; height: 48px; border-radius: 12px; 
+      border: 2px solid var(--border-dark);
+      background: #fff; font-size: 1.2rem; font-weight: 800; cursor: pointer;
+      box-shadow: 2px 2px 0px var(--border-dark);
+      transition: all 0.1s ease;
+    }
+    .btn-count:active {
+      transform: translate(2px, 2px);
+      box-shadow: 0px 0px 0px var(--border-dark);
+    }
+    .btn-count.active { 
+      background: var(--primary); 
+      color: #fff; 
+      border-color: var(--border-dark);
+      box-shadow: 2px 2px 0px var(--border-dark);
+    }
+
+    .player-inputs { margin-bottom: 24px; }
+    .player-input-item { margin-bottom: 10px; }
+    .player-input-item input {
+      width: 100%; max-width: 260px; padding: 10px 14px; 
+      border: 2px solid var(--border-dark);
+      border-radius: 10px; font-size: 1rem; font-weight: 700; text-align: center; outline: none;
+      box-shadow: 2px 2px 0px #E2E8F0;
+    }
+    .player-input-item input:focus { border-color: var(--primary); }
+
+    .btn-start {
+      background: var(--accent-yellow); 
+      color: #000; 
+      border: 2.5px solid var(--border-dark); 
+      border-radius: 12px;
+      padding: 12px 40px; font-size: 1.05rem; font-weight: 800; cursor: pointer;
+      box-shadow: 3px 3px 0px var(--border-dark);
+      transition: all 0.1s ease;
+    }
+    .btn-start:active { 
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0px var(--border-dark);
+    }
+
+    /* Scoreboard Table */
+    #game-container { display: none; }
+    .table-wrapper {
+      background: var(--card-bg);
+      border-radius: 16px;
+      border: 2.5px solid var(--border-dark);
+      overflow-x: auto;
+      box-shadow: 4px 4px 0px var(--border-dark);
+    }
+    table { width: 100%; border-collapse: collapse; min-width: 320px; }
+    th, td {
+      border: 1.5px solid var(--border-dark);
+      padding: 8px 4px;
+      text-align: center;
+      font-size: 0.85rem;
+    }
+    th { 
+      background: #F8FAFC; 
+      color: var(--text-main); 
+      font-weight: 800; 
+      font-size: 0.95rem;
+    }
+    .col-category { 
+      width: 38%; 
+      text-align: left; 
+      padding-left: 8px; 
+      font-weight: 700; 
+    }
+    .cat-main { display: flex; align-items: center; gap: 4px; font-size: 0.9rem; }
+    .dice-icon { font-size: 1.15rem; line-height: 1; }
+    .dice-example { 
+      font-size: 0.82rem; 
+      letter-spacing: -0.5px; 
+      color: var(--text-muted); 
+      font-weight: 700;
+      margin-top: 2px;
+      display: block;
+    }
+    .subtext { font-size: 0.68rem; color: var(--text-muted); font-weight: 500; }
+
+    .section-header {
+      background: #E2E8F0;
+      color: #1E293B;
+      font-weight: 800;
+      text-align: left;
+      padding-left: 10px;
+      font-size: 0.8rem;
+    }
+
+    .cell-score {
+      cursor: pointer;
+      background: #FFF;
+      height: 44px;
+      font-weight: 800;
+      font-size: 1.05rem;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: background-color 0.1s ease;
+    }
+    .cell-score:active {
+      background-color: var(--primary-light);
+    }
+    .cell-score.empty { color: #CBD5E1; }
+    .cell-score.filled { background-color: var(--primary-light); color: var(--primary-dark); }
+    .cell-score.zero { color: var(--accent-red); font-weight: 800; }
+
+    .summary-row { background: #F8FAFC; font-weight: 800; }
+    .total-row { 
+      background: #FEF3C7; 
+      font-size: 1.1rem; 
+      font-weight: 900; 
+      color: #B45309; 
+    }
+
+    .game-actions {
+      display: flex; justify-content: space-between; margin-top: 16px;
+    }
+    .btn-sub {
+      background: #FFF; 
+      border: 2px solid var(--border-dark); 
+      border-radius: 8px;
+      padding: 8px 14px; font-size: 0.85rem; font-weight: 700; color: var(--text-main); 
+      cursor: pointer;
+      box-shadow: 2px 2px 0px var(--border-dark);
+    }
+    .btn-sub:active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0px var(--border-dark);
+    }
+
+    /* Modal for Input */
+    .modal-overlay {
+      display: none; 
+      position: fixed; 
+      inset: 0; 
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(2px);
+      align-items: center; 
+      justify-content: center; 
+      z-index: 9999;
+    }
+    .modal-overlay.open {
+      display: flex !important;
+    }
+
+    .modal {
+      background: #FFF; 
+      border-radius: 16px; 
+      width: 90%; 
+      max-width: 330px;
+      padding: 22px; 
+      text-align: center; 
+      border: 3px solid var(--border-dark);
+      box-shadow: 5px 5px 0px var(--border-dark);
+    }
+    .modal h3 { font-size: 1.15rem; font-weight: 800; margin-bottom: 4px; }
+    .modal p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px; font-weight: 600; }
+
+    .btn-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+    .btn-choice {
+      padding: 10px 4px; 
+      border: 2px solid var(--border-dark); 
+      background: #F8FAFC;
+      border-radius: 8px; 
+      font-weight: 800; 
+      font-size: 0.95rem; 
+      cursor: pointer;
+      box-shadow: 2px 2px 0px var(--border-dark);
+      transition: all 0.1s ease;
+    }
+    .btn-choice:active { 
+      transform: translate(2px, 2px);
+      box-shadow: 0px 0px 0px var(--border-dark);
+      background: var(--primary-light); 
+    }
+
+    .modal-number-input {
+      width: 100%; padding: 12px; 
+      border: 2px solid var(--border-dark);
+      border-radius: 8px; font-size: 1.3rem; font-weight: 800; text-align: center; margin-bottom: 12px; outline: none;
+    }
+    .modal-btn-confirm {
+      width: 100%; background: var(--primary); color: #FFF; 
+      border: 2px solid var(--border-dark);
+      border-radius: 8px; padding: 12px; font-weight: 800; font-size: 1rem; cursor: pointer;
+      box-shadow: 2px 2px 0px var(--border-dark);
+    }
+    .modal-btn-confirm:active {
+      transform: translate(2px, 2px);
+      box-shadow: 0px 0px 0px var(--border-dark);
+    }
+    .modal-btn-zero {
+      width: 100%; background: #FFF; 
+      border: 2px solid var(--accent-red); 
+      color: var(--accent-red);
+      border-radius: 8px; padding: 10px; font-weight: 800; font-size: 0.9rem; margin-top: 8px; cursor: pointer;
+    }
+
+    .winner-banner {
+      display: none; 
+      background: #FEF3C7; 
+      border: 2.5px solid var(--border-dark);
+      border-radius: 12px; 
+      padding: 14px; 
+      text-align: center; 
+      margin-bottom: 14px;
+      color: #B45309; 
+      font-weight: 800;
+      font-size: 1rem;
+      box-shadow: 3px 3px 0px var(--border-dark);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1 class="brand-title" onclick="goHome()">🎲 YACHT DICE 점수판</h1>
+  </header>
+
+  <div class="container">
+    <div id="setup-card">
+      <h2 class="setup-title">플레이어 설정</h2>
+      <p class="setup-desc">참여 인원과 이름을 정해주세요</p>
+      
+      <div class="player-btn-group">
+        <button type="button" class="btn-count" onclick="setPlayerCount(1)">1</button>
+        <button type="button" class="btn-count active" onclick="setPlayerCount(2)">2</button>
+        <button type="button" class="btn-count" onclick="setPlayerCount(3)">3</button>
+        <button type="button" class="btn-count" onclick="setPlayerCount(4)">4</button>
+      </div>
+
+      <div class="player-inputs" id="player-inputs-container"></div>
+
+      <button type="button" class="btn-start" onclick="startGame()">게임 시작하기</button>
+    </div>
+
+    <div id="game-container">
+      <div id="winner-banner" class="winner-banner"></div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr id="header-row">
+              <th class="col-category">카테고리</th>
+            </tr>
+          </thead>
+          <tbody id="score-body"></tbody>
+        </table>
+      </div>
+
+      <div class="game-actions">
+        <button class="btn-sub" onclick="resetScores()">점수 초기화</button>
+        <button class="btn-sub" onclick="goHome()">설정으로 돌아가기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 점수 입력 모달 -->
+  <div id="input-modal" class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+      <h3 id="modal-title">카테고리</h3>
+      <p id="modal-desc">점수를 선택하거나 입력하세요</p>
+
+      <div id="modal-preset-container" class="btn-grid"></div>
+      <div id="modal-custom-container" style="display:none;">
+        <input type="number" id="custom-score-input" class="modal-number-input" min="0" max="30" placeholder="점수 입력">
+        <button class="modal-btn-confirm" onclick="applyCustomScore()">확인</button>
+      </div>
+
+      <button class="modal-btn-zero" onclick="applyScore(0)">0점 처리 (포기)</button>
+    </div>
+  </div>
+
+  <script>
+    // 상단 카테고리: 주사위 아이콘 매핑
+    const UPPER_CATEGORIES = [
+      { id: 'aces', name: 'Aces', icon: '⚀', sub: '1의 눈 합', base: 1 },
+      { id: 'deuces', name: 'Deuces', icon: '⚁', sub: '2의 눈 합', base: 2 },
+      { id: 'threes', name: 'Threes', icon: '⚂', sub: '3의 눈 합', base: 3 },
+      { id: 'fours', name: 'Fours', icon: '⚃', sub: '4의 눈 합', base: 4 },
+      { id: 'fives', name: 'Fives', icon: '⚄', sub: '5의 눈 합', base: 5 },
+      { id: 'sixes', name: 'Sixes', icon: '⚅', sub: '6의 눈 합', base: 6 }
+    ];
+
+    // 하단 카테고리: 직관적인 주사위 조합 예시 추가
+    const LOWER_CATEGORIES = [
+      { id: 'choice', name: 'Choice', example: '⚀⚂⚃⚄⚅', sub: '주사위 5개 총합', type: 'custom', max: 30 },
+      { id: 'four_kind', name: '4 of a Kind', example: '⚄⚄⚄⚄ ⚁', sub: '동일 눈 4개 합', type: 'custom', max: 30 },
+      { id: 'full_house', name: 'Full House', example: '⚂⚂⚂ ⚅⚅', sub: '3개+2개 (25점)', type: 'fixed', score: 25 },
+      { id: 's_straight', name: 'S. Straight', example: '⚀⚁⚂⚃', sub: '4개 연속 (30점)', type: 'fixed', score: 30 },
+      { id: 'l_straight', name: 'L. Straight', example: '⚁⚂⚃⚄⚅', sub: '5개 연속 (40점)', type: 'fixed', score: 40 },
+      { id: 'yacht', name: 'Yacht', example: '⚅⚅⚅⚅⚅', sub: '동일 눈 5개 (50점)', type: 'fixed', score: 50 }
+    ];
+
+    let playerCount = 2;
+    let players = [];
+    let scores = {};
+    let activeCell = null;
+
+    function setPlayerCount(count) {
+      playerCount = count;
+      document.querySelectorAll('.btn-count').forEach((btn, idx) => {
+        btn.classList.toggle('active', idx + 1 === count);
+      });
+      renderNameInputs();
+    }
+
+    function renderNameInputs() {
+      const container = document.getElementById('player-inputs-container');
+      container.innerHTML = '';
+      for (let i = 0; i < playerCount; i++) {
+        const div = document.createElement('div');
+        div.className = 'player-input-item';
+        div.innerHTML = `<input type="text" id="p-name-${i}" value="플레이어 ${i + 1}" maxlength="6">`;
+        container.appendChild(div);
+      }
+    }
+
+    function startGame() {
+      players = [];
+      scores = {};
+      for (let i = 0; i < playerCount; i++) {
+        const name = document.getElementById(`p-name-${i}`).value.trim() || `P${i + 1}`;
+        players.push(name);
+        scores[i] = {};
+      }
+
+      document.getElementById('setup-card').style.display = 'none';
+      document.getElementById('game-container').style.display = 'block';
+      buildTable();
+    }
+
+    function buildTable() {
+      const headerRow = document.getElementById('header-row');
+      headerRow.innerHTML = '<th class="col-category">카테고리</th>';
+      players.forEach(name => {
+        const th = document.createElement('th');
+        th.textContent = name;
+        headerRow.appendChild(th);
+      });
+
+      const tbody = document.getElementById('score-body');
+      tbody.innerHTML = '';
+
+      // Section: Upper
+      tbody.innerHTML += `<tr><td colspan="${playerCount + 1}" class="section-header">상단 (Upper Section)</td></tr>`;
+      UPPER_CATEGORIES.forEach(cat => {
+        tbody.appendChild(createRow(cat, true));
+      });
+
+      tbody.appendChild(createSummaryRow('upper_subtotal', '상단 합계', '63점 이상 보너스'));
+      tbody.appendChild(createSummaryRow('bonus', '보너스 (+35)', '63점 달성 시'));
+
+      // Section: Lower
+      tbody.innerHTML += `<tr><td colspan="${playerCount + 1}" class="section-header">하단 (Lower Section)</td></tr>`;
+      LOWER_CATEGORIES.forEach(cat => {
+        tbody.appendChild(createRow(cat, false));
+      });
+
+      tbody.appendChild(createTotalRow());
+    }
+
+    function createRow(cat, isUpper) {
+      const tr = document.createElement('tr');
+      
+      let titleHtml = '';
+      if (isUpper) {
+        titleHtml = `
+          <div class="cat-main">
+            <span class="dice-icon">${cat.icon}</span>
+            <span>${cat.name}</span>
+          </div>
+          <span class="subtext">${cat.sub}</span>
+        `;
+      } else {
+        titleHtml = `
+          <div class="cat-main">
+            <span>${cat.name}</span>
+          </div>
+          <span class="dice-example">${cat.example}</span>
+          <span class="subtext">${cat.sub}</span>
+        `;
+      }
+
+      tr.innerHTML = `<td class="col-category">${titleHtml}</td>`;
+      for (let i = 0; i < playerCount; i++) {
+        const td = document.createElement('td');
+        td.className = 'cell-score empty';
+        td.id = `cell-${i}-${cat.id}`;
+        td.textContent = '-';
+        td.onclick = () => openInputModal(i, cat);
+        tr.appendChild(td);
+      }
+      return tr;
+    }
+
+    function createSummaryRow(id, title, sub) {
+      const tr = document.createElement('tr');
+      tr.className = 'summary-row';
+      tr.innerHTML = `<td class="col-category"><div>${title}</div><span class="subtext">${sub}</span></td>`;
+      for (let i = 0; i < playerCount; i++) {
+        tr.innerHTML += `<td id="cell-calc-${id}-${i}">0</td>`;
+      }
+      return tr;
+    }
+
+    function createTotalRow() {
+      const tr = document.createElement('tr');
+      tr.className = 'total-row';
+      tr.innerHTML = `<td class="col-category"><strong>총점 (Total)</strong></td>`;
+      for (let i = 0; i < playerCount; i++) {
+        tr.innerHTML += `<td id="cell-calc-total-${i}">0</td>`;
+      }
+      return tr;
+    }
+
+    function openInputModal(pIndex, cat) {
+      activeCell = { pIndex, cat };
+      const iconPrefix = cat.icon ? `${cat.icon} ` : '';
+      document.getElementById('modal-title').textContent = `${players[pIndex]} - ${iconPrefix}${cat.name}`;
+      document.getElementById('modal-desc').textContent = cat.example ? `${cat.example} (${cat.sub})` : cat.sub;
+
+      const presetContainer = document.getElementById('modal-preset-container');
+      const customContainer = document.getElementById('modal-custom-container');
+      presetContainer.innerHTML = '';
+
+      if (cat.base) {
+        presetContainer.style.display = 'grid';
+        customContainer.style.display = 'none';
+        for (let count = 1; count <= 5; count++) {
+          const val = count * cat.base;
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'btn-choice';
+          btn.textContent = `${val}점 (${count}개)`;
+          btn.onclick = () => applyScore(val);
+          presetContainer.appendChild(btn);
+        }
+      } else if (cat.type === 'fixed') {
+        presetContainer.style.display = 'grid';
+        presetContainer.style.gridTemplateColumns = '1fr';
+        customContainer.style.display = 'none';
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn-choice';
+        btn.style.color = 'var(--primary)';
+        btn.textContent = `달성 (+${cat.score}점)`;
+        btn.onclick = () => applyScore(cat.score);
+        presetContainer.appendChild(btn);
+      } else {
+        presetContainer.style.display = 'none';
+        customContainer.style.display = 'block';
+        const input = document.getElementById('custom-score-input');
+        input.value = '';
+        setTimeout(() => input.focus(), 100);
+      }
+
+      document.getElementById('input-modal').classList.add('open');
+    }
+
+    function closeModal(e) {
+      document.getElementById('input-modal').classList.remove('open');
+    }
+
+    function applyCustomScore() {
+      const input = document.getElementById('custom-score-input');
+      const val = parseInt(input.value, 10);
+      if (isNaN(val) || val < 0 || val > 30) {
+        alert('0에서 30 사이의 유효한 점수를 입력해주세요.');
+        return;
+      }
+      applyScore(val);
+    }
+
+    function applyScore(val) {
+      if (!activeCell) return;
+      const { pIndex, cat } = activeCell;
+      scores[pIndex][cat.id] = val;
+
+      const cell = document.getElementById(`cell-${pIndex}-${cat.id}`);
+      cell.textContent = val;
+      cell.classList.remove('empty', 'zero');
+      cell.classList.add('filled');
+      if (val === 0) cell.classList.add('zero');
+
+      recalculate();
+      closeModal();
+    }
+
+    function recalculate() {
+      let allFinished = true;
+
+      for (let i = 0; i < playerCount; i++) {
+        let upperSum = 0;
+        let upperFilled = 0;
+        UPPER_CATEGORIES.forEach(cat => {
+          const s = scores[i][cat.id];
+          if (s !== undefined && s !== null) {
+            upperSum += s;
+            upperFilled++;
+          }
+        });
+        document.getElementById(`cell-calc-upper_subtotal-${i}`).textContent = `${upperSum} / 63`;
+
+        const bonus = upperSum >= 63 ? 35 : 0;
+        const bonusCell = document.getElementById(`cell-calc-bonus-${i}`);
+        bonusCell.textContent = bonus;
+        bonusCell.style.color = bonus > 0 ? 'var(--accent-green)' : 'inherit';
+
+        let lowerSum = 0;
+        let lowerFilled = 0;
+        LOWER_CATEGORIES.forEach(cat => {
+          const s = scores[i][cat.id];
+          if (s !== undefined && s !== null) {
+            lowerSum += s;
+            lowerFilled++;
+          }
+        });
+
+        const total = upperSum + bonus + lowerSum;
+        document.getElementById(`cell-calc-total-${i}`).textContent = total;
+
+        if ((upperFilled + lowerFilled) < 12) {
+          allFinished = false;
+        }
+      }
+
+      if (allFinished) {
+        showWinner();
+      }
+    }
+
+    function showWinner() {
+      let maxScore = -1;
+      let winners = [];
+      for (let i = 0; i < playerCount; i++) {
+        const total = parseInt(document.getElementById(`cell-calc-total-${i}`).textContent, 10);
+        if (total > maxScore) {
+          maxScore = total;
+          winners = [players[i]];
+        } else if (total === maxScore) {
+          winners.push(players[i]);
+        }
+      }
+
+      const banner = document.getElementById('winner-banner');
+      banner.style.display = 'block';
+      banner.innerHTML = `🎉 오늘의 Winner: <strong>${winners.join(', ')}</strong> (${maxScore}점)! 게임 종료!`;
+    }
+
+    function resetScores() {
+      if (!confirm('현재 점수 초기화?')) return;
+      for (let i = 0; i < playerCount; i++) {
+        scores[i] = {};
+      }
+      document.getElementById('winner-banner').style.display = 'none';
+      buildTable();
+    }
+
+    function goHome() {
+      const isGameActive = document.getElementById('game-container').style.display === 'block';
+      if (isGameActive) {
+        const confirmed = confirm('메인 설정 화면으로 돌아가? 현재 점수는 초기화T.T.');
+        if (!confirmed) return;
+      }
+
+      document.getElementById('winner-banner').style.display = 'none';
+      document.getElementById('game-container').style.display = 'none';
+      document.getElementById('setup-card').style.display = 'block';
+    }
+
+    renderNameInputs();
+  </script>
+</body>
+</html>
