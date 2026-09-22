@@ -29,6 +29,7 @@
       margin: 0; 
       padding: 0; 
       font-family: "Pretendard Variable", Pretendard, -apple-system, sans-serif;
+      touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
     }
     
@@ -36,6 +37,7 @@
       background-color: var(--bg); 
       color: var(--text-main); 
       padding-bottom: 40px; 
+      overflow-x: hidden;
     }
 
     header {
@@ -75,8 +77,8 @@
       text-align: center;
       margin-top: 16px;
     }
-    .setup-title { font-size: 1.2rem; font-weight: 800; margin-bottom: 4px; color: var(--text-main); }
-    .setup-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 18px; font-weight: 500; }
+    .setup-title { font-size: 1.2rem; font-weight: 800; margin-bottom: 6px; color: var(--text-main); }
+    .setup-desc { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; font-weight: 600; }
 
     .player-btn-group { display: flex; gap: 10px; justify-content: center; margin-bottom: 24px; }
     .btn-count {
@@ -122,7 +124,7 @@
     }
 
     /* Scoreboard Table */
-    #game-container { display: none; }
+    #game-container { display: none; position: relative; }
     .table-wrapper {
       background: var(--card-bg);
       border-radius: 16px;
@@ -144,22 +146,45 @@
       font-size: 0.95rem;
     }
     .col-category { 
-      width: 38%; 
+      width: 44%; 
       text-align: left; 
-      padding-left: 8px; 
+      padding: 6px 8px; 
       font-weight: 700; 
     }
-    .cat-main { display: flex; align-items: center; gap: 4px; font-size: 0.9rem; }
-    .dice-icon { font-size: 1.15rem; line-height: 1; }
-    .dice-example { 
-      font-size: 0.82rem; 
-      letter-spacing: -0.5px; 
-      color: var(--text-muted); 
-      font-weight: 700;
-      margin-top: 2px;
-      display: block;
+    .cat-main { display: flex; align-items: center; gap: 6px; font-size: 0.9rem; }
+    .subtext { font-size: 0.68rem; color: var(--text-muted); font-weight: 500; display: block; margin-top: 1px; }
+
+    /* 내장형 SVG 주사위 스타일 */
+    .dice-svg {
+      width: 22px;
+      height: 22px;
+      display: inline-block;
+      vertical-align: middle;
+      flex-shrink: 0;
     }
-    .subtext { font-size: 0.68rem; color: var(--text-muted); font-weight: 500; }
+    .dice-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      margin-top: 3px;
+      flex-wrap: wrap;
+    }
+    .dice-svg.mini {
+      width: 17px;
+      height: 17px;
+    }
+    .dice-op {
+      font-size: 0.75rem;
+      font-weight: 900;
+      color: var(--text-muted);
+      margin: 0 1px;
+    }
+    .dice-or {
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin: 0 3px;
+    }
 
     .section-header {
       background: #E2E8F0;
@@ -173,11 +198,11 @@
     .cell-score {
       cursor: pointer;
       background: #FFF;
-      height: 46px;
+      height: 44px;
       font-weight: 800;
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       user-select: none;
-      touch-action: manipulation;
+      transition: background-color 0.1s ease;
     }
     .cell-score:active {
       background-color: var(--primary-light);
@@ -210,13 +235,16 @@
       box-shadow: 1px 1px 0px var(--border-dark);
     }
 
-    /* Modal for Input */
-    .modal-overlay {
-      display: none; 
+    /* 팝업 모달창 (투명도 60% 및 블러 적용) */
+    #input-modal {
+      display: none;
       position: fixed; 
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(15, 23, 42, 0.65);
-      backdrop-filter: blur(3px);
+      top: 0; 
+      left: 0; 
+      width: 100vw; 
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(4px);
       align-items: center; 
       justify-content: center; 
       z-index: 99999;
@@ -224,16 +252,18 @@
     }
 
     .modal {
-      background: #FFF; 
-      border-radius: 16px; 
+      background: rgba(255, 255, 255, 0.6); /* 투명도 60% */
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 20px; 
       width: 100%; 
       max-width: 320px;
-      padding: 20px; 
+      padding: 22px 18px; 
       text-align: center; 
       border: 3px solid var(--border-dark);
-      box-shadow: 5px 5px 0px var(--border-dark);
+      box-shadow: 6px 6px 0px var(--border-dark);
     }
-    .modal h3 { font-size: 1.2rem; font-weight: 800; margin-bottom: 4px; }
+    .modal h3 { font-size: 1.15rem; font-weight: 800; margin-bottom: 4px; }
     .modal p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px; font-weight: 600; }
 
     .btn-grid { 
@@ -243,15 +273,15 @@
       margin-bottom: 12px; 
     }
     .btn-choice {
-      padding: 12px 4px; 
+      padding: 11px 4px; 
       border: 2px solid var(--border-dark); 
-      background: #F8FAFC;
-      border-radius: 8px; 
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 10px; 
       font-weight: 800; 
-      font-size: 0.95rem; 
+      font-size: 0.92rem; 
       cursor: pointer;
       box-shadow: 2px 2px 0px var(--border-dark);
-      touch-action: manipulation;
+      transition: all 0.1s ease;
     }
     .btn-choice:active { 
       transform: translate(2px, 2px);
@@ -262,30 +292,33 @@
     .modal-number-input {
       width: 100%; padding: 12px; 
       border: 2px solid var(--border-dark);
-      border-radius: 8px; font-size: 1.3rem; font-weight: 800; text-align: center; margin-bottom: 12px; outline: none;
+      border-radius: 10px; font-size: 1.3rem; font-weight: 800; text-align: center; margin-bottom: 12px; outline: none;
+      background: rgba(255, 255, 255, 0.9);
     }
     .modal-btn-confirm {
       width: 100%; background: var(--primary); color: #FFF; 
       border: 2px solid var(--border-dark);
-      border-radius: 8px; padding: 12px; font-weight: 800; font-size: 1rem; cursor: pointer;
+      border-radius: 10px; padding: 12px; font-weight: 800; font-size: 1rem; cursor: pointer;
       box-shadow: 2px 2px 0px var(--border-dark);
-      touch-action: manipulation;
+    }
+    .modal-btn-confirm:active {
+      transform: translate(2px, 2px);
+      box-shadow: 0px 0px 0px var(--border-dark);
     }
     
-    /* 0점 처리 포기 버튼 */
     .modal-btn-zero {
       width: 100%; 
-      background: #FFF; 
+      background: rgba(255, 255, 255, 0.85); 
       border: 2px solid var(--accent-red); 
       color: var(--accent-red);
-      border-radius: 8px; 
-      padding: 12px; 
+      border-radius: 10px; 
+      padding: 11px; 
       font-weight: 800; 
       font-size: 0.95rem; 
       margin-top: 8px; 
       cursor: pointer;
       box-shadow: 2px 2px 0px var(--accent-red);
-      touch-action: manipulation;
+      display: block;
     }
     .modal-btn-zero:active {
       transform: translate(2px, 2px);
@@ -306,6 +339,41 @@
       font-size: 1rem;
       box-shadow: 3px 3px 0px var(--border-dark);
     }
+
+    /* 화면 2/3 높이까지 솟아오르는 이모지 폭죽 연출 */
+    .confetti-container {
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 999999;
+      overflow: hidden;
+    }
+    .confetti-item {
+      position: absolute;
+      bottom: -40px;
+      font-size: 2.2rem;
+      user-select: none;
+      animation: shootUp 2.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes shootUp {
+      0% {
+        transform: translateY(0) scale(0.6) rotate(0deg);
+        opacity: 1;
+      }
+      60% {
+        /* 화면 2/3 높이까지 솟아오름 (약 -67vh) */
+        transform: translateY(calc(-67vh + var(--rand-y))) scale(1.2) rotate(var(--rand-rot));
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(calc(-67vh + var(--rand-y) + 80px)) scale(1) rotate(calc(var(--rand-rot) * 1.5));
+        opacity: 0;
+      }
+    }
   </style>
 </head>
 <body>
@@ -316,8 +384,8 @@
 
   <div class="container">
     <div id="setup-card">
-      <h2 class="setup-title">플레이어 설정</h2>
-      <p class="setup-desc">참여 인원과 이름을 정해주세요</p>
+      <h2 class="setup-title">울려라 울려라 야추를 울려~ 🔔</h2>
+      <p class="setup-desc">닉네임을 입력하세요 😎</p>
       
       <div class="player-btn-group">
         <button type="button" class="btn-count" onclick="setPlayerCount(1)">1</button>
@@ -328,7 +396,7 @@
 
       <div class="player-inputs" id="player-inputs-container"></div>
 
-      <button type="button" class="btn-start" onclick="startGame()">게임 시작하기</button>
+      <button type="button" class="btn-start" onclick="startGame()">Game on 🔥</button>
     </div>
 
     <div id="game-container">
@@ -346,49 +414,107 @@
       </div>
 
       <div class="game-actions">
-        <button class="btn-sub" onclick="resetScores()">점수 초기화</button>
-        <button class="btn-sub" onclick="goHome()">설정으로 돌아가기</button>
+        <button type="button" class="btn-sub" onclick="resetScores()">판 뒤엎기 🧹</button>
+        <button type="button" class="btn-sub" onclick="goHome()">메인화면으로 돌아가기 🏠</button>
       </div>
     </div>
   </div>
 
-  <!-- 점수 입력 모달창 -->
-  <div id="input-modal" class="modal-overlay" onclick="closeModal(event)">
+  <!-- 점수 입력 모달 -->
+  <div id="input-modal" onclick="closeModal(event)">
     <div class="modal" onclick="event.stopPropagation()">
       <h3 id="modal-title">카테고리</h3>
-      <p id="modal-desc">점수를 선택하세요</p>
+      <p id="modal-desc">점수를 입력해주세요</p>
 
-      <!-- 상단 눈 선택 버튼 및 고정 점수 영역 -->
       <div id="modal-preset-container" class="btn-grid"></div>
-
-      <!-- 직접 입력 영역 (Choice, 4 of a Kind) -->
+      
       <div id="modal-custom-container" style="display:none;">
         <input type="number" id="custom-score-input" class="modal-number-input" min="0" max="30" placeholder="점수 입력">
-        <button type="button" class="modal-btn-confirm" onclick="applyCustomScore()">확인</button>
+        <button type="button" class="modal-btn-confirm" onclick="applyCustomScore()">점수 입력 완료!</button>
       </div>
 
-      <!-- 상단/하단 공통 0점 처리 버튼 -->
-      <button type="button" class="modal-btn-zero" onclick="applyScore(0)">0점 처리 (포기)</button>
+      <button type="button" class="modal-btn-zero" onclick="applyScore(0)">0점 처리 (포기) 😭</button>
     </div>
   </div>
 
+  <!-- 폭죽 컨테이너 -->
+  <div id="confetti-container" class="confetti-container"></div>
+
   <script>
+    // 주사위 1~6 SVG 제너레이터 함수
+    function getDiceSvg(val, isMini = false) {
+      const cls = isMini ? 'dice-svg mini' : 'dice-svg';
+      let dots = '';
+      if (val === 1) {
+        dots = '<circle cx="50" cy="50" r="15" fill="#DC2626"/>';
+      } else if (val === 2) {
+        dots = '<circle cx="28" cy="28" r="9" fill="#1E293B"/><circle cx="72" cy="72" r="9" fill="#1E293B"/>';
+      } else if (val === 3) {
+        dots = '<circle cx="26" cy="26" r="9" fill="#1E293B"/><circle cx="50" cy="50" r="9" fill="#1E293B"/><circle cx="74" cy="74" r="9" fill="#1E293B"/>';
+      } else if (val === 4) {
+        dots = '<circle cx="28" cy="28" r="9" fill="#1E293B"/><circle cx="72" cy="28" r="9" fill="#1E293B"/><circle cx="28" cy="72" r="9" fill="#1E293B"/><circle cx="72" cy="72" r="9" fill="#1E293B"/>';
+      } else if (val === 5) {
+        dots = '<circle cx="26" cy="26" r="9" fill="#1E293B"/><circle cx="74" cy="26" r="9" fill="#1E293B"/><circle cx="50" cy="50" r="9" fill="#1E293B"/><circle cx="26" cy="74" r="9" fill="#1E293B"/><circle cx="74" cy="74" r="9" fill="#1E293B"/>';
+      } else if (val === 6) {
+        dots = '<circle cx="28" cy="25" r="8.5" fill="#1E293B"/><circle cx="28" cy="50" r="8.5" fill="#1E293B"/><circle cx="28" cy="75" r="8.5" fill="#1E293B"/><circle cx="72" cy="25" r="8.5" fill="#1E293B"/><circle cx="72" cy="50" r="8.5" fill="#1E293B"/><circle cx="72" cy="75" r="8.5" fill="#1E293B"/>';
+      }
+      return `<svg class="${cls}" viewBox="0 0 100 100"><rect x="5" y="5" width="90" height="90" rx="20" fill="#FFFFFF" stroke="#1E293B" stroke-width="8"/>${dots}</svg>`;
+    }
+
     const UPPER_CATEGORIES = [
-      { id: 'aces', name: 'Aces', icon: '⚀', sub: '1의 눈 합', base: 1 },
-      { id: 'deuces', name: 'Deuces', icon: '⚁', sub: '2의 눈 합', base: 2 },
-      { id: 'threes', name: 'Threes', icon: '⚂', sub: '3의 눈 합', base: 3 },
-      { id: 'fours', name: 'Fours', icon: '⚃', sub: '4의 눈 합', base: 4 },
-      { id: 'fives', name: 'Fives', icon: '⚄', sub: '5의 눈 합', base: 5 },
-      { id: 'sixes', name: 'Sixes', icon: '⚅', sub: '6의 눈 합', base: 6 }
+      { id: 'aces', name: 'Aces', diceVal: 1, sub: '1의 눈 합', base: 1 },
+      { id: 'deuces', name: 'Deuces', diceVal: 2, sub: '2의 눈 합', base: 2 },
+      { id: 'threes', name: 'Threes', diceVal: 3, sub: '3의 눈 합', base: 3 },
+      { id: 'fours', name: 'Fours', diceVal: 4, sub: '4의 눈 합', base: 4 },
+      { id: 'fives', name: 'Fives', diceVal: 5, sub: '5의 눈 합', base: 5 },
+      { id: 'sixes', name: 'Sixes', diceVal: 6, sub: '6의 눈 합', base: 6 }
     ];
 
+    // 하단 족보 주사위 구성 HTML
+    const dMini = (n) => getDiceSvg(n, true);
     const LOWER_CATEGORIES = [
-      { id: 'choice', name: 'Choice', example: '⚀⚂⚃⚄⚅', sub: '주사위 5개 총합', type: 'custom', max: 30 },
-      { id: 'four_kind', name: '4 of a Kind', example: '⚄⚄⚄⚄ ⚁', sub: '동일 눈 4개 합', type: 'custom', max: 30 },
-      { id: 'full_house', name: 'Full House', example: '⚂⚂⚂ ⚅⚅', sub: '3개+2개 (25점)', type: 'fixed', score: 25 },
-      { id: 's_straight', name: 'S. Straight', example: '⚀⚁⚂⚃', sub: '4개 연속 (30점)', type: 'fixed', score: 30 },
-      { id: 'l_straight', name: 'L. Straight', example: '⚁⚂⚃⚄⚅', sub: '5개 연속 (40점)', type: 'fixed', score: 40 },
-      { id: 'yacht', name: 'Yacht', example: '⚅⚅⚅⚅⚅', sub: '동일 눈 5개 (50점)', type: 'fixed', score: 50 }
+      { 
+        id: 'choice', 
+        name: 'Choice', 
+        diceHtml: `${dMini(1)}${dMini(2)}${dMini(3)}${dMini(4)}${dMini(5)}`, 
+        type: 'custom', 
+        max: 30 
+      },
+      { 
+        id: 'four_kind', 
+        name: '4 of a Kind', 
+        diceHtml: `${dMini(5)}${dMini(5)}${dMini(5)}${dMini(5)} <span class="dice-op">➕</span> ${dMini(2)}`, 
+        type: 'custom', 
+        max: 30 
+      },
+      { 
+        id: 'full_house', 
+        name: 'Full House', 
+        diceHtml: `${dMini(3)}${dMini(3)}${dMini(3)} <span class="dice-op">➕</span> ${dMini(6)}${dMini(6)} (25점)`, 
+        type: 'fixed', 
+        score: 25 
+      },
+      { 
+        id: 's_straight', 
+        name: 'S. Straight', 
+        diceHtml: `${dMini(1)}${dMini(2)}${dMini(3)}${dMini(4)} <span class="dice-or">or</span> ${dMini(2)}${dMini(3)}${dMini(4)}${dMini(5)} (30점)`, 
+        type: 'fixed', 
+        score: 30 
+      },
+      { 
+        id: 'l_straight', 
+        name: 'L. Straight', 
+        diceHtml: `${dMini(1)}${dMini(2)}${dMini(3)}${dMini(4)}${dMini(5)} <span class="dice-or">or</span> ${dMini(2)}${dMini(3)}${dMini(4)}${dMini(5)}${dMini(6)} (40점)`, 
+        type: 'fixed', 
+        score: 40 
+      },
+      { 
+        id: 'yacht', 
+        name: 'Yacht', 
+        diceHtml: `${dMini(6)}${dMini(6)}${dMini(6)}${dMini(6)}${dMini(6)} (50점)`, 
+        type: 'fixed', 
+        score: 50 
+      }
     ];
 
     let playerCount = 2;
@@ -441,60 +567,60 @@
       const tbody = document.getElementById('score-body');
       tbody.innerHTML = '';
 
-      // Section: Upper
+      // 상단 섹션
       tbody.innerHTML += `<tr><td colspan="${playerCount + 1}" class="section-header">상단 (Upper Section)</td></tr>`;
       UPPER_CATEGORIES.forEach(cat => {
-        tbody.appendChild(createRow(cat, true));
+        tbody.appendChild(createUpperRow(cat));
       });
 
       tbody.appendChild(createSummaryRow('upper_subtotal', '상단 합계', '63점 이상 보너스'));
-      tbody.appendChild(createSummaryRow('bonus', '보너스 (+35)', '63점 달성 시'));
+      tbody.appendChild(createSummaryRow('bonus', '보너스 (+35) 🎁', '63점 달성 시'));
 
-      // Section: Lower
+      // 하단 섹션
       tbody.innerHTML += `<tr><td colspan="${playerCount + 1}" class="section-header">하단 (Lower Section)</td></tr>`;
       LOWER_CATEGORIES.forEach(cat => {
-        tbody.appendChild(createRow(cat, false));
+        tbody.appendChild(createLowerRow(cat));
       });
 
       tbody.appendChild(createTotalRow());
     }
 
-    function createRow(cat, isUpper) {
+    function createUpperRow(cat) {
       const tr = document.createElement('tr');
-      
-      let titleHtml = '';
-      if (isUpper) {
-        titleHtml = `
-          <div class="cat-main">
-            <span class="dice-icon">${cat.icon}</span>
-            <span>${cat.name}</span>
-          </div>
-          <span class="subtext">${cat.sub}</span>
-        `;
-      } else {
-        titleHtml = `
-          <div class="cat-main">
-            <span>${cat.name}</span>
-          </div>
-          <span class="dice-example">${cat.example}</span>
-          <span class="subtext">${cat.sub}</span>
-        `;
-      }
-
+      const titleHtml = `
+        <div class="cat-main">
+          ${getDiceSvg(cat.diceVal)}
+          <span>${cat.name}</span>
+        </div>
+        <span class="subtext">${cat.sub}</span>
+      `;
       tr.innerHTML = `<td class="col-category">${titleHtml}</td>`;
-      
       for (let i = 0; i < playerCount; i++) {
         const td = document.createElement('td');
         td.className = 'cell-score empty';
         td.id = `cell-${i}-${cat.id}`;
         td.textContent = '-';
-        
-        // 터치 및 클릭 이벤트 직접 연결
-        td.addEventListener('click', function(e) {
-          e.preventDefault();
-          openInputModal(i, cat);
-        });
-        
+        td.onclick = () => openInputModal(i, cat);
+        tr.appendChild(td);
+      }
+      return tr;
+    }
+
+    function createLowerRow(cat) {
+      const tr = document.createElement('tr');
+      const titleHtml = `
+        <div class="cat-main">
+          <span>${cat.name}</span>
+        </div>
+        <div class="dice-row">${cat.diceHtml}</div>
+      `;
+      tr.innerHTML = `<td class="col-category">${titleHtml}</td>`;
+      for (let i = 0; i < playerCount; i++) {
+        const td = document.createElement('td');
+        td.className = 'cell-score empty';
+        td.id = `cell-${i}-${cat.id}`;
+        td.textContent = '-';
+        td.onclick = () => openInputModal(i, cat);
         tr.appendChild(td);
       }
       return tr;
@@ -513,7 +639,7 @@
     function createTotalRow() {
       const tr = document.createElement('tr');
       tr.className = 'total-row';
-      tr.innerHTML = `<td class="col-category"><strong>총점 (Total)</strong></td>`;
+      tr.innerHTML = `<td class="col-category"><strong>총점 (Total) 🏆</strong></td>`;
       for (let i = 0; i < playerCount; i++) {
         tr.innerHTML += `<td id="cell-calc-total-${i}">0</td>`;
       }
@@ -522,20 +648,17 @@
 
     function openInputModal(pIndex, cat) {
       activeCell = { pIndex, cat };
-      const iconPrefix = cat.icon ? `${cat.icon} ` : '';
-      document.getElementById('modal-title').textContent = `${players[pIndex]} - ${iconPrefix}${cat.name}`;
-      document.getElementById('modal-desc').textContent = cat.example ? `${cat.example} (${cat.sub})` : cat.sub;
+      document.getElementById('modal-title').textContent = `${players[pIndex]} - ${cat.name}`;
+      document.getElementById('modal-desc').textContent = '점수를 입력해주세요';
 
       const presetContainer = document.getElementById('modal-preset-container');
       const customContainer = document.getElementById('modal-custom-container');
       presetContainer.innerHTML = '';
 
       if (cat.base) {
-        // 상단 항목: 1개~5개 퀵 버튼 (3열 그리드로 깔끔하게 5개 배치)
         presetContainer.style.display = 'grid';
         presetContainer.style.gridTemplateColumns = 'repeat(3, 1fr)';
         customContainer.style.display = 'none';
-        
         for (let count = 1; count <= 5; count++) {
           const val = count * cat.base;
           const btn = document.createElement('button');
@@ -546,20 +669,17 @@
           presetContainer.appendChild(btn);
         }
       } else if (cat.type === 'fixed') {
-        // 하단 고정 점수 항목
         presetContainer.style.display = 'grid';
         presetContainer.style.gridTemplateColumns = '1fr';
         customContainer.style.display = 'none';
-        
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'btn-choice';
         btn.style.color = 'var(--primary)';
-        btn.textContent = `달성 (+${cat.score}점)`;
+        btn.textContent = `달성 (+${cat.score}점) ✨`;
         btn.onclick = () => applyScore(cat.score);
         presetContainer.appendChild(btn);
       } else {
-        // 하단 직접 입력 항목 (Choice, 4 of a Kind)
         presetContainer.style.display = 'none';
         customContainer.style.display = 'block';
         const input = document.getElementById('custom-score-input');
@@ -567,9 +687,7 @@
         setTimeout(() => input.focus(), 150);
       }
 
-      // 인라인 flex 강제 적용으로 모달 확실히 띄움
-      const modalOverlay = document.getElementById('input-modal');
-      modalOverlay.style.display = 'flex';
+      document.getElementById('input-modal').style.display = 'flex';
     }
 
     function closeModal(e) {
@@ -580,7 +698,7 @@
       const input = document.getElementById('custom-score-input');
       const val = parseInt(input.value, 10);
       if (isNaN(val) || val < 0 || val > 30) {
-        alert('0에서 30 사이의 유효한 점수를 입력해주세요.');
+        alert('0~30 점 사이만 입력 가능합니다 ;)');
         return;
       }
       applyScore(val);
@@ -644,6 +762,41 @@
       }
     }
 
+    // 🎉👑✨ 폭죽 애니메이션 실행
+    function triggerConfetti() {
+      const container = document.getElementById('confetti-container');
+      container.innerHTML = '';
+      const emojis = ['🎉', '👑', '✨'];
+
+      for (let i = 0; i < 36; i++) {
+        const span = document.createElement('span');
+        span.className = 'confetti-item';
+        span.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+
+        // 가로 출발 위치 (0% ~ 100%)
+        const startX = Math.random() * 92 + 4;
+        span.style.left = `${startX}vw`;
+
+        // 솟구치는 높이 미세 난수 (-30px ~ 40px)
+        const randY = (Math.random() * 70 - 30) + 'px';
+        span.style.setProperty('--rand-y', randY);
+
+        // 회전 각도 (-180deg ~ 180deg)
+        const randRot = (Math.random() * 360 - 180) + 'deg';
+        span.style.setProperty('--rand-rot', randRot);
+
+        // 시간차 딜레이 발사
+        span.style.animationDelay = `${Math.random() * 0.7}s`;
+
+        container.appendChild(span);
+      }
+
+      // 애니메이션 종료 후 요소 제거
+      setTimeout(() => {
+        container.innerHTML = '';
+      }, 4000);
+    }
+
     function showWinner() {
       let maxScore = -1;
       let winners = [];
@@ -659,11 +812,14 @@
 
       const banner = document.getElementById('winner-banner');
       banner.style.display = 'block';
-      banner.innerHTML = `🎉 승자: <strong>${winners.join(', ')}</strong> (${maxScore}점)! 게임 종료!`;
+      banner.innerHTML = `🏆 승자: <strong>${winners.join(', ')}</strong> (${maxScore}점)! 축하합니다! 🎉`;
+
+      // 폭죽 실행
+      triggerConfetti();
     }
 
     function resetScores() {
-      if (!confirm('현재 점수를 모두 초기화할까요?')) return;
+      if (!confirm('점수가 초기화 됩니다 T.T')) return;
       for (let i = 0; i < playerCount; i++) {
         scores[i] = {};
       }
@@ -674,7 +830,7 @@
     function goHome() {
       const isGameActive = document.getElementById('game-container').style.display === 'block';
       if (isGameActive) {
-        const confirmed = confirm('메인 설정 화면으로 돌아가시겠습니까? 현재 기록된 점수는 초기화됩니다.');
+        const confirmed = confirm('점수가 초기화 됩니다 T.T');
         if (!confirmed) return;
       }
 
