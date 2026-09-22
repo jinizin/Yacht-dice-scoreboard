@@ -5,20 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Yacht Dice Scoreboard</title>
   
-  <!-- 무료 오픈소스 Pretendard 웹폰트 -->
+  <!-- Pretendard 웹폰트 -->
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
 
   <style>
     :root {
-      --primary: #2563EB;       /* 선명한 보드게임 로열 블루 */
+      --primary: #2563EB;
       --primary-dark: #1D4ED8;
       --primary-light: #DBEAFE;
-      --accent-red: #DC2626;     /* 0점/경고 레드 */
-      --accent-yellow: #F59E0B;  /* 승자/골드 옐로 */
-      --accent-green: #059669;   /* 보너스 그린 */
+      --accent-red: #DC2626;
+      --accent-yellow: #F59E0B;
+      --accent-green: #059669;
       --bg: #F1F5F9;
       --card-bg: #FFFFFF;
-      --border-dark: #1E293B;    /* 캐주얼한 느낌을 주는 또렷한 외곽선 */
+      --border-dark: #1E293B;
       --border: #CBD5E1;
       --text-main: #0F172A;
       --text-muted: #475569;
@@ -29,7 +29,7 @@
       margin: 0; 
       padding: 0; 
       font-family: "Pretendard Variable", Pretendard, -apple-system, sans-serif;
-      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
     
     body { 
@@ -56,7 +56,6 @@
       font-weight: 800;
       color: #FFFFFF;
       user-select: none;
-      -webkit-tap-highlight-color: transparent;
       transition: transform 0.1s ease;
       letter-spacing: -0.5px;
     }
@@ -174,12 +173,11 @@
     .cell-score {
       cursor: pointer;
       background: #FFF;
-      height: 44px;
+      height: 46px;
       font-weight: 800;
-      font-size: 1.05rem;
+      font-size: 1.1rem;
       user-select: none;
-      -webkit-tap-highlight-color: transparent;
-      transition: background-color 0.1s ease;
+      touch-action: manipulation;
     }
     .cell-score:active {
       background-color: var(--primary-light);
@@ -216,33 +214,36 @@
     .modal-overlay {
       display: none; 
       position: fixed; 
-      inset: 0; 
-      background: rgba(15, 23, 42, 0.6);
-      backdrop-filter: blur(2px);
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(3px);
       align-items: center; 
       justify-content: center; 
-      z-index: 9999;
-    }
-    .modal-overlay.open {
-      display: flex !important;
+      z-index: 99999;
+      padding: 16px;
     }
 
     .modal {
       background: #FFF; 
       border-radius: 16px; 
-      width: 90%; 
-      max-width: 330px;
-      padding: 22px; 
+      width: 100%; 
+      max-width: 320px;
+      padding: 20px; 
       text-align: center; 
       border: 3px solid var(--border-dark);
       box-shadow: 5px 5px 0px var(--border-dark);
     }
-    .modal h3 { font-size: 1.15rem; font-weight: 800; margin-bottom: 4px; }
+    .modal h3 { font-size: 1.2rem; font-weight: 800; margin-bottom: 4px; }
     .modal p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px; font-weight: 600; }
 
-    .btn-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+    .btn-grid { 
+      display: grid; 
+      grid-template-columns: repeat(3, 1fr); 
+      gap: 8px; 
+      margin-bottom: 12px; 
+    }
     .btn-choice {
-      padding: 10px 4px; 
+      padding: 12px 4px; 
       border: 2px solid var(--border-dark); 
       background: #F8FAFC;
       border-radius: 8px; 
@@ -250,7 +251,7 @@
       font-size: 0.95rem; 
       cursor: pointer;
       box-shadow: 2px 2px 0px var(--border-dark);
-      transition: all 0.1s ease;
+      touch-action: manipulation;
     }
     .btn-choice:active { 
       transform: translate(2px, 2px);
@@ -268,16 +269,28 @@
       border: 2px solid var(--border-dark);
       border-radius: 8px; padding: 12px; font-weight: 800; font-size: 1rem; cursor: pointer;
       box-shadow: 2px 2px 0px var(--border-dark);
+      touch-action: manipulation;
     }
-    .modal-btn-confirm:active {
-      transform: translate(2px, 2px);
-      box-shadow: 0px 0px 0px var(--border-dark);
-    }
+    
+    /* 0점 처리 포기 버튼 */
     .modal-btn-zero {
-      width: 100%; background: #FFF; 
+      width: 100%; 
+      background: #FFF; 
       border: 2px solid var(--accent-red); 
       color: var(--accent-red);
-      border-radius: 8px; padding: 10px; font-weight: 800; font-size: 0.9rem; margin-top: 8px; cursor: pointer;
+      border-radius: 8px; 
+      padding: 12px; 
+      font-weight: 800; 
+      font-size: 0.95rem; 
+      margin-top: 8px; 
+      cursor: pointer;
+      box-shadow: 2px 2px 0px var(--accent-red);
+      touch-action: manipulation;
+    }
+    .modal-btn-zero:active {
+      transform: translate(2px, 2px);
+      box-shadow: 0px 0px 0px var(--accent-red);
+      background: #FEF2F2;
     }
 
     .winner-banner {
@@ -339,24 +352,27 @@
     </div>
   </div>
 
-  <!-- 점수 입력 모달 -->
+  <!-- 점수 입력 모달창 -->
   <div id="input-modal" class="modal-overlay" onclick="closeModal(event)">
     <div class="modal" onclick="event.stopPropagation()">
       <h3 id="modal-title">카테고리</h3>
-      <p id="modal-desc">점수를 선택하거나 입력하세요</p>
+      <p id="modal-desc">점수를 선택하세요</p>
 
+      <!-- 상단 눈 선택 버튼 및 고정 점수 영역 -->
       <div id="modal-preset-container" class="btn-grid"></div>
+
+      <!-- 직접 입력 영역 (Choice, 4 of a Kind) -->
       <div id="modal-custom-container" style="display:none;">
         <input type="number" id="custom-score-input" class="modal-number-input" min="0" max="30" placeholder="점수 입력">
-        <button class="modal-btn-confirm" onclick="applyCustomScore()">확인</button>
+        <button type="button" class="modal-btn-confirm" onclick="applyCustomScore()">확인</button>
       </div>
 
-      <button class="modal-btn-zero" onclick="applyScore(0)">0점 처리 (포기)</button>
+      <!-- 상단/하단 공통 0점 처리 버튼 -->
+      <button type="button" class="modal-btn-zero" onclick="applyScore(0)">0점 처리 (포기)</button>
     </div>
   </div>
 
   <script>
-    // 상단 카테고리: 주사위 아이콘 매핑
     const UPPER_CATEGORIES = [
       { id: 'aces', name: 'Aces', icon: '⚀', sub: '1의 눈 합', base: 1 },
       { id: 'deuces', name: 'Deuces', icon: '⚁', sub: '2의 눈 합', base: 2 },
@@ -366,7 +382,6 @@
       { id: 'sixes', name: 'Sixes', icon: '⚅', sub: '6의 눈 합', base: 6 }
     ];
 
-    // 하단 카테고리: 직관적인 주사위 조합 예시 추가
     const LOWER_CATEGORIES = [
       { id: 'choice', name: 'Choice', example: '⚀⚂⚃⚄⚅', sub: '주사위 5개 총합', type: 'custom', max: 30 },
       { id: 'four_kind', name: '4 of a Kind', example: '⚄⚄⚄⚄ ⚁', sub: '동일 눈 4개 합', type: 'custom', max: 30 },
@@ -467,12 +482,19 @@
       }
 
       tr.innerHTML = `<td class="col-category">${titleHtml}</td>`;
+      
       for (let i = 0; i < playerCount; i++) {
         const td = document.createElement('td');
         td.className = 'cell-score empty';
         td.id = `cell-${i}-${cat.id}`;
         td.textContent = '-';
-        td.onclick = () => openInputModal(i, cat);
+        
+        // 터치 및 클릭 이벤트 직접 연결
+        td.addEventListener('click', function(e) {
+          e.preventDefault();
+          openInputModal(i, cat);
+        });
+        
         tr.appendChild(td);
       }
       return tr;
@@ -509,8 +531,11 @@
       presetContainer.innerHTML = '';
 
       if (cat.base) {
+        // 상단 항목: 1개~5개 퀵 버튼 (3열 그리드로 깔끔하게 5개 배치)
         presetContainer.style.display = 'grid';
+        presetContainer.style.gridTemplateColumns = 'repeat(3, 1fr)';
         customContainer.style.display = 'none';
+        
         for (let count = 1; count <= 5; count++) {
           const val = count * cat.base;
           const btn = document.createElement('button');
@@ -521,9 +546,11 @@
           presetContainer.appendChild(btn);
         }
       } else if (cat.type === 'fixed') {
+        // 하단 고정 점수 항목
         presetContainer.style.display = 'grid';
         presetContainer.style.gridTemplateColumns = '1fr';
         customContainer.style.display = 'none';
+        
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'btn-choice';
@@ -532,18 +559,21 @@
         btn.onclick = () => applyScore(cat.score);
         presetContainer.appendChild(btn);
       } else {
+        // 하단 직접 입력 항목 (Choice, 4 of a Kind)
         presetContainer.style.display = 'none';
         customContainer.style.display = 'block';
         const input = document.getElementById('custom-score-input');
         input.value = '';
-        setTimeout(() => input.focus(), 100);
+        setTimeout(() => input.focus(), 150);
       }
 
-      document.getElementById('input-modal').classList.add('open');
+      // 인라인 flex 강제 적용으로 모달 확실히 띄움
+      const modalOverlay = document.getElementById('input-modal');
+      modalOverlay.style.display = 'flex';
     }
 
     function closeModal(e) {
-      document.getElementById('input-modal').classList.remove('open');
+      document.getElementById('input-modal').style.display = 'none';
     }
 
     function applyCustomScore() {
@@ -629,11 +659,11 @@
 
       const banner = document.getElementById('winner-banner');
       banner.style.display = 'block';
-      banner.innerHTML = `🎉 오늘의 Winner: <strong>${winners.join(', ')}</strong> (${maxScore}점)! 게임 종료!`;
+      banner.innerHTML = `🎉 승자: <strong>${winners.join(', ')}</strong> (${maxScore}점)! 게임 종료!`;
     }
 
     function resetScores() {
-      if (!confirm('현재 점수 초기화?')) return;
+      if (!confirm('현재 점수를 모두 초기화할까요?')) return;
       for (let i = 0; i < playerCount; i++) {
         scores[i] = {};
       }
@@ -644,7 +674,7 @@
     function goHome() {
       const isGameActive = document.getElementById('game-container').style.display === 'block';
       if (isGameActive) {
-        const confirmed = confirm('메인 설정 화면으로 돌아가? 현재 점수는 초기화T.T.');
+        const confirmed = confirm('메인 설정 화면으로 돌아가시겠습니까? 현재 기록된 점수는 초기화됩니다.');
         if (!confirmed) return;
       }
 
