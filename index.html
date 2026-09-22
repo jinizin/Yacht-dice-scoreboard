@@ -67,7 +67,7 @@
 
     .container { max-width: 600px; margin: 0 auto; padding: 14px 10px; }
 
-    /* Setup Screen */
+    /* 설정 화면 */
     #setup-card {
       background: var(--card-bg);
       border-radius: 16px;
@@ -123,7 +123,7 @@
       box-shadow: 1px 1px 0px var(--border-dark);
     }
 
-    /* Scoreboard Table */
+    /* 점수판 테이블 */
     #game-container { display: none; position: relative; }
     .table-wrapper {
       background: var(--card-bg);
@@ -165,7 +165,7 @@
     .dice-row {
       display: inline-flex;
       align-items: center;
-      gap: 2px;
+      gap: 3px;
       margin-top: 3px;
       flex-wrap: wrap;
     }
@@ -173,17 +173,14 @@
       width: 17px;
       height: 17px;
     }
-    .dice-op {
-      font-size: 0.75rem;
-      font-weight: 900;
-      color: var(--text-muted);
-      margin: 0 1px;
+    .dice-spacer {
+      display: inline-block;
+      width: 5px;
     }
-    .dice-or {
-      font-size: 0.7rem;
-      font-weight: 800;
-      color: var(--primary);
-      margin: 0 3px;
+    .dice-party {
+      font-size: 0.95rem;
+      vertical-align: middle;
+      margin-left: 2px;
     }
 
     .section-header {
@@ -219,7 +216,7 @@
       color: #B45309; 
     }
 
-    /* 하단 컨트롤 버튼 (홈 / 종료) */
+    /* 하단 버튼 2개 */
     .game-actions {
       display: flex; 
       gap: 10px;
@@ -263,22 +260,24 @@
       background: #FCA5A5;
     }
 
-    /* 팝업 모달창 (투명도 60%) */
-    #input-modal {
+    /* 공통 모달 오버레이 */
+    .modal-overlay {
       display: none;
       position: fixed; 
       top: 0; 
       left: 0; 
       width: 100vw; 
       height: 100vh;
-      background: rgba(15, 23, 42, 0.5);
+      background: rgba(15, 23, 42, 0.45);
       backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
       align-items: center; 
       justify-content: center; 
       z-index: 99999;
       padding: 16px;
     }
 
+    /* 점수 입력 모달 카드 (반투명 60%) */
     .modal {
       background: rgba(255, 255, 255, 0.6);
       backdrop-filter: blur(14px);
@@ -354,21 +353,88 @@
       background: #FEF2F2;
     }
 
-    .winner-banner {
-      display: none; 
-      background: #FEF3C7; 
-      border: 2.5px solid var(--border-dark);
-      border-radius: 12px; 
-      padding: 14px; 
+    /* 승자 결과 전용 중앙 팝업 카드 (반투명 60%) */
+    .winner-modal-card {
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 22px; 
+      width: 100%; 
+      max-width: 330px;
+      padding: 26px 20px 22px; 
       text-align: center; 
-      margin-bottom: 14px;
-      color: #B45309; 
-      font-weight: 800;
-      font-size: 1rem;
-      box-shadow: 3px 3px 0px var(--border-dark);
+      border: 3px solid var(--border-dark);
+      box-shadow: 6px 6px 0px var(--border-dark);
+      animation: popUp 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
     }
 
-    /* 화면 2/3 폭죽 연출 */
+    @keyframes popUp {
+      0% { transform: scale(0.85); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .winner-title {
+      font-size: 1.45rem;
+      font-weight: 900;
+      color: var(--text-main);
+      margin-bottom: 16px;
+    }
+    .winner-champion-card {
+      background: rgba(254, 243, 199, 0.85);
+      border: 2.5px solid var(--accent-yellow);
+      border-radius: 14px;
+      padding: 14px 10px;
+      margin-bottom: 14px;
+      box-shadow: 2px 2px 0px var(--border-dark);
+    }
+    .winner-champion-name {
+      font-size: 1.3rem;
+      font-weight: 900;
+      color: #92400E;
+    }
+    .winner-champion-score {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #B45309;
+      margin-top: 2px;
+    }
+    .winner-ranks-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 20px;
+    }
+    .winner-rank-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.85);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 12px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .winner-home-btn {
+      width: 100%;
+      background: var(--primary);
+      color: #FFF;
+      border: 2px solid var(--border-dark);
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 2px 2px 0px var(--border-dark);
+      transition: all 0.1s ease;
+    }
+    .winner-home-btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: 0px 0px 0px var(--border-dark);
+    }
+
+    /* 팝업 위 레이어 포물선 폭죽 (z-index: 100000) */
     .confetti-container {
       position: fixed;
       left: 0;
@@ -376,7 +442,7 @@
       width: 100vw;
       height: 100vh;
       pointer-events: none;
-      z-index: 999999;
+      z-index: 100000;
       overflow: hidden;
     }
     .confetti-item {
@@ -384,20 +450,20 @@
       bottom: -40px;
       font-size: 2.2rem;
       user-select: none;
-      animation: shootUp 2.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      animation: shootArc 2.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     }
 
-    @keyframes shootUp {
+    @keyframes shootArc {
       0% {
         transform: translateY(0) scale(0.6) rotate(0deg);
         opacity: 1;
       }
       60% {
-        transform: translateY(calc(-67vh + var(--rand-y))) scale(1.2) rotate(var(--rand-rot));
+        transform: translateY(var(--target-y)) scale(1.2) rotate(var(--target-rot));
         opacity: 1;
       }
       100% {
-        transform: translateY(calc(-67vh + var(--rand-y) + 80px)) scale(1) rotate(calc(var(--rand-rot) * 1.5));
+        transform: translateY(calc(var(--target-y) + 70px)) scale(0.95) rotate(calc(var(--target-rot) * 1.5));
         opacity: 0;
       }
     }
@@ -427,8 +493,6 @@
     </div>
 
     <div id="game-container">
-      <div id="winner-banner" class="winner-banner"></div>
-
       <div class="table-wrapper">
         <table>
           <thead>
@@ -440,7 +504,6 @@
         </table>
       </div>
 
-      <!-- 하단 컨트롤 버튼 2개: 홈으로 돌아가기(좌) / 여기서 게임 종료(우) -->
       <div class="game-actions">
         <button type="button" class="btn-action-home" onclick="goHome()">홈으로 돌아가기 🏠</button>
         <button type="button" class="btn-action-end" onclick="finishGameEarly()">여기서 게임 종료 🏁</button>
@@ -449,7 +512,7 @@
   </div>
 
   <!-- 점수 입력 모달 -->
-  <div id="input-modal" onclick="closeModal(event)">
+  <div id="input-modal" class="modal-overlay" onclick="closeModal(event)">
     <div class="modal" onclick="event.stopPropagation()">
       <h3 id="modal-title">카테고리</h3>
       <p id="modal-desc">점수를 입력해주세요</p>
@@ -465,7 +528,23 @@
     </div>
   </div>
 
-  <!-- 폭죽 컨테이너 -->
+  <!-- 점수판 위에 정중앙으로 뜨는 승자 안내 반투명 모달 팝업 -->
+  <div id="winner-modal" class="modal-overlay">
+    <div class="winner-modal-card" onclick="event.stopPropagation()">
+      <div class="winner-title">🎲 Winner! 🏆</div>
+      
+      <div class="winner-champion-card">
+        <div class="winner-champion-name" id="winner-name">Player Name</div>
+        <div class="winner-champion-score" id="winner-score">0점</div>
+      </div>
+
+      <div class="winner-ranks-list" id="winner-ranks-list"></div>
+
+      <button type="button" class="winner-home-btn" onclick="closeWinnerAndGoHome()">홈으로 돌아가기</button>
+    </div>
+  </div>
+
+  <!-- 팝업 위 레이어 폭죽 컨테이너 -->
   <div id="confetti-container" class="confetti-container"></div>
 
   <script>
@@ -488,7 +567,6 @@
       return `<svg class="${cls}" viewBox="0 0 100 100"><rect x="5" y="5" width="90" height="90" rx="20" fill="#FFFFFF" stroke="#1E293B" stroke-width="8"/>${dots}</svg>`;
     }
 
-    // 족보 데이터 맵
     const ALL_CATEGORIES = {
       aces: { id: 'aces', name: 'Aces', diceVal: 1, sub: '1의 눈 합', base: 1, isUpper: true },
       deuces: { id: 'deuces', name: 'Deuces', diceVal: 2, sub: '2의 눈 합', base: 2, isUpper: true },
@@ -508,19 +586,20 @@
     const LOWER_KEYS = ['choice', 'four_kind', 'full_house', 's_straight', 'l_straight', 'yacht'];
 
     const dMini = (n) => getDiceSvg(n, true);
+
     const LOWER_ICONS = {
       choice: `${dMini(1)}${dMini(2)}${dMini(3)}${dMini(4)}${dMini(5)}`,
-      four_kind: `${dMini(5)}${dMini(5)}${dMini(5)}${dMini(5)} <span class="dice-op">➕</span> ${dMini(2)}`,
-      full_house: `${dMini(3)}${dMini(3)}${dMini(3)} <span class="dice-op">➕</span> ${dMini(6)}${dMini(6)} (25점)`,
-      s_straight: `${dMini(1)}${dMini(2)}${dMini(3)}${dMini(4)} <span class="dice-or">or</span> ${dMini(2)}${dMini(3)}${dMini(4)}${dMini(5)} (30점)`,
-      l_straight: `${dMini(1)}${dMini(2)}${dMini(3)}${dMini(4)}${dMini(5)} <span class="dice-or">or</span> ${dMini(2)}${dMini(3)}${dMini(4)}${dMini(5)}${dMini(6)} (40점)`,
-      yacht: `${dMini(6)}${dMini(6)}${dMini(6)}${dMini(6)}${dMini(6)} (50점)`
+      four_kind: `${dMini(5)}${dMini(5)}${dMini(5)}${dMini(5)}`,
+      full_house: `${dMini(3)}${dMini(3)}${dMini(3)}<span class="dice-spacer"></span>${dMini(6)}${dMini(6)} (25점)`,
+      s_straight: `${dMini(1)}${dMini(2)}${dMini(3)}${dMini(4)} (30점)`,
+      l_straight: `${dMini(1)}${dMini(2)}${dMini(3)}${dMini(4)}${dMini(5)} (40점)`,
+      yacht: `${dMini(6)}${dMini(6)}${dMini(6)}${dMini(6)}${dMini(6)} <span class="dice-party">🎉</span> (50점)`
     };
 
     let playerCount = 2;
     let players = [];
     let scores = {};
-    let activeCell = null; // { pIndex, catId }
+    let activeCell = null;
 
     function setPlayerCount(count) {
       playerCount = count;
@@ -567,7 +646,6 @@
       const tbody = document.getElementById('score-body');
       tbody.innerHTML = '';
 
-      // 상단 섹션
       tbody.innerHTML += `<tr><td colspan="${playerCount + 1}" class="section-header">상단 (Upper Section)</td></tr>`;
       UPPER_KEYS.forEach(key => {
         const cat = ALL_CATEGORIES[key];
@@ -588,7 +666,6 @@
       tbody.appendChild(createSummaryRow('upper_subtotal', '상단 합계', '63점 이상 보너스'));
       tbody.appendChild(createSummaryRow('bonus', '보너스 (+35) 🎁', '63점 달성 시'));
 
-      // 하단 섹션
       tbody.innerHTML += `<tr><td colspan="${playerCount + 1}" class="section-header">하단 (Lower Section)</td></tr>`;
       LOWER_KEYS.forEach(key => {
         const cat = ALL_CATEGORIES[key];
@@ -605,7 +682,6 @@
 
       tbody.appendChild(createTotalRow());
 
-      // 이벤트 위임 바인딩 (터치 씹힘 완벽 방지)
       tbody.onclick = function(e) {
         const cell = e.target.closest('.cell-score');
         if (!cell) return;
@@ -643,7 +719,6 @@
       return tr;
     }
 
-    // 모달 띄우기 함수
     function openModalDirect(pIndex, catId) {
       const cat = ALL_CATEGORIES[catId];
       if (!cat) return;
@@ -657,7 +732,6 @@
       presetContainer.innerHTML = '';
 
       if (cat.base) {
-        // 상단 눈 (1~5개)
         presetContainer.style.display = 'grid';
         presetContainer.style.gridTemplateColumns = 'repeat(3, 1fr)';
         customContainer.style.display = 'none';
@@ -671,7 +745,6 @@
           presetContainer.appendChild(btn);
         }
       } else if (cat.type === 'fixed') {
-        // 하단 고정 점수
         presetContainer.style.display = 'grid';
         presetContainer.style.gridTemplateColumns = '1fr';
         customContainer.style.display = 'none';
@@ -683,7 +756,6 @@
         btn.onclick = () => applyScore(cat.score);
         presetContainer.appendChild(btn);
       } else {
-        // 하단 직접 입력
         presetContainer.style.display = 'none';
         customContainer.style.display = 'block';
         const input = document.getElementById('custom-score-input');
@@ -764,63 +836,88 @@
       }
 
       if (allFinished) {
-        showWinner();
+        showWinnerModal();
       }
     }
 
+    /* 포물선형 5구역 분산 폭죽 */
     function triggerConfetti() {
       const container = document.getElementById('confetti-container');
       container.innerHTML = '';
       const emojis = ['🎉', '👑', '✨'];
+      
+      const zoneMultipliers = [0.70, 0.85, 1.00, 0.90, 0.75];
+      const baseMaxHeight = 72;
 
-      for (let i = 0; i < 36; i++) {
+      for (let i = 0; i < 42; i++) {
         const span = document.createElement('span');
         span.className = 'confetti-item';
         span.textContent = emojis[Math.floor(Math.random() * emojis.length)];
 
-        const startX = Math.random() * 92 + 4;
+        const zone = Math.floor(Math.random() * 5);
+        const zoneStart = zone * 20;
+        const startX = zoneStart + Math.random() * 18 + 1;
         span.style.left = `${startX}vw`;
 
-        const randY = (Math.random() * 70 - 30) + 'px';
-        span.style.setProperty('--rand-y', randY);
+        const multiplier = zoneMultipliers[zone];
+        const targetHeightVh = (baseMaxHeight * multiplier) + (Math.random() * 6 - 3);
+        span.style.setProperty('--target-y', `-${targetHeightVh}vh`);
 
         const randRot = (Math.random() * 360 - 180) + 'deg';
-        span.style.setProperty('--rand-rot', randRot);
+        span.style.setProperty('--target-rot', randRot);
 
-        span.style.animationDelay = `${Math.random() * 0.7}s`;
+        span.style.animationDelay = `${Math.random() * 0.75}s`;
         container.appendChild(span);
       }
 
-      setTimeout(() => { container.innerHTML = ''; }, 4000);
+      setTimeout(() => { container.innerHTML = ''; }, 4200);
     }
 
-    function showWinner() {
-      let maxScore = -1;
-      let winners = [];
+    /* 승자 모달 표시 함수 (화면 정중앙 반투명 팝업) */
+    function showWinnerModal() {
+      const ranking = [];
       for (let i = 0; i < playerCount; i++) {
         const total = parseInt(document.getElementById(`cell-calc-total-${i}`).textContent, 10);
-        if (total > maxScore) {
-          maxScore = total;
-          winners = [players[i]];
-        } else if (total === maxScore) {
-          winners.push(players[i]);
-        }
+        ranking.push({ name: players[i], score: total });
+      }
+      ranking.sort((a, b) => b.score - a.score);
+
+      const winner = ranking[0];
+      document.getElementById('winner-name').textContent = winner.name;
+      document.getElementById('winner-score').textContent = `${winner.score}점`;
+
+      const ranksContainer = document.getElementById('winner-ranks-list');
+      ranksContainer.innerHTML = '';
+
+      for (let r = 1; r < ranking.length; r++) {
+        if (r > 2) break;
+        const rankLabel = r === 1 ? '🥈 2등' : '🥉 3등';
+        const item = document.createElement('div');
+        item.className = 'winner-rank-item';
+        item.innerHTML = `
+          <span>${rankLabel}: ${ranking[r].name}</span>
+          <span>${ranking[r].score}점</span>
+        `;
+        ranksContainer.appendChild(item);
       }
 
-      const banner = document.getElementById('winner-banner');
-      banner.style.display = 'block';
-      banner.innerHTML = `🏆 승자: <strong>${winners.join(', ')}</strong> (${maxScore}점)! 축하합니다! 🎉`;
+      // 모달 열기
+      document.getElementById('winner-modal').style.display = 'flex';
       triggerConfetti();
     }
 
-    // 여기서 게임 종료 (중도 종료 및 현재 점수 기준 승자 산출)
-    function finishGameEarly() {
-      if (!confirm('현재 점수 기준으로 게임을 종료하고 승자를 정할까요?')) return;
-      showWinner();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    function closeWinnerAndGoHome() {
+      document.getElementById('winner-modal').style.display = 'none';
+      document.getElementById('confetti-container').innerHTML = '';
+      document.getElementById('game-container').style.display = 'none';
+      document.getElementById('setup-card').style.display = 'block';
     }
 
-    // 홈으로 돌아가기 (초기화)
+    function finishGameEarly() {
+      if (!confirm('현재 점수 기준으로 게임을 종료하고 승자를 정할까요?')) return;
+      showWinnerModal();
+    }
+
     function goHome() {
       const isGameActive = document.getElementById('game-container').style.display === 'block';
       if (isGameActive) {
@@ -828,7 +925,8 @@
         if (!confirmed) return;
       }
 
-      document.getElementById('winner-banner').style.display = 'none';
+      document.getElementById('winner-modal').style.display = 'none';
+      document.getElementById('confetti-container').innerHTML = '';
       document.getElementById('game-container').style.display = 'none';
       document.getElementById('setup-card').style.display = 'block';
     }
